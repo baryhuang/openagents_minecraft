@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "baritone-control",
+  "version": "${version}",
+  "name": "Baritone Control API",
+  "description": "HTTP API to control Minecraft via Baritone",
+  "authors": ["ClaudeBot"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.claudebot.control.BaritoneControlMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": "1.21.5",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "baritone": "*"
+  }
+}

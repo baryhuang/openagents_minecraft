@@ -1,0 +1,32 @@
+# Build artifacts
+baritone-control-mod/build/
+baritone-control-mod/.gradle/
+baritone-control-mod/libs/
+baritone-control-mod/gradle/
+baritone-control-mod/gradlew
+baritone-control-mod/gradlew.bat
+
+# Client runtime
+client/
+!client/.gitkeep
+
+# Node.js (legacy mineflayer bot)
+node_modules/
+package-lock.json
+
+# Runtime files
+*.log
+*.png
+status.txt
+command.txt
+jsmacros_cmd.txt
+bot.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
