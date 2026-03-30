@@ -3,6 +3,14 @@
 Control a Minecraft Java Edition client via Baritone pathfinding + HTTP API.
 All actions are visible in the real Minecraft client UI — not headless.
 
+[![Demo Video](https://img.youtube.com/vi/0E4twnn97m0/maxresdefault.jpg)](https://www.youtube.com/watch?v=0E4twnn97m0)
+
+**[Watch the demo video](https://www.youtube.com/watch?v=0E4twnn97m0)**
+
+| Bot building a house | Baritone pathfinding | In-game view |
+|:---:|:---:|:---:|
+| ![House](assets/screenshot_house.png) | ![Building](assets/screenshot_building.png) | ![In-game](assets/screenshot_ingame.png) |
+
 ## Architecture
 
 ```

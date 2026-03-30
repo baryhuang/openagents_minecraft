@@ -27,6 +27,9 @@ bot.log
 *.iml
 .vscode/
 
+# Keep assets
+!assets/*.png
+
 # OS
 .DS_Store
 Thumbs.db
