@@ -38,6 +38,7 @@ public class HttpControlServer {
             server.createContext("/attack", this::handleAttack);
             server.createContext("/place", this::handlePlace);
             server.createContext("/health", this::handleHealth);
+            server.createContext("/mouselock", this::handleMouseLock);
 
             server.setExecutor(null);
             server.start();
@@ -235,8 +236,11 @@ public class HttpControlServer {
             String result = runOnTick(() -> {
                 ClientPlayerEntity p = getPlayer();
                 if (p == null) return jsonError("Not in game");
+                // Set both player rotation and locked rotation
                 p.setYaw(yaw);
                 p.setPitch(pitch);
+                BaritoneControlMod.lockedYaw = yaw;
+                BaritoneControlMod.lockedPitch = pitch;
                 return jsonOk("Looking at yaw=" + yaw + " pitch=" + pitch);
             });
             respond(ex, 200, result);
@@ -345,6 +349,59 @@ public class HttpControlServer {
                     p.getHealth(), p.getHungerManager().getFoodLevel(),
                     p.getHungerManager().getSaturationLevel(), p.getArmor(), p.experienceLevel
                 );
+            });
+            respond(ex, 200, result);
+        } catch (Exception e) {
+            respond(ex, 500, jsonError(e.getMessage()));
+        }
+    }
+
+    private void handleMouseLock(HttpExchange ex) throws IOException {
+        try {
+            String body = readBody(ex); // "on", "off", "toggle", or empty (returns status)
+            if (body.isEmpty() || body.equals("status")) {
+                respond(ex, 200, String.format(
+                    "{\"status\":\"ok\",\"mouse_locked\":%b,\"allow_baritone_rotation\":%b,\"locked_yaw\":%.1f,\"locked_pitch\":%.1f}",
+                    BaritoneControlMod.mouseLocked,
+                    BaritoneControlMod.allowBaritoneRotation,
+                    BaritoneControlMod.lockedYaw,
+                    BaritoneControlMod.lockedPitch
+                ));
+                return;
+            }
+            String result = runOnTick(() -> {
+                switch (body.toLowerCase()) {
+                    case "on":
+                    case "true":
+                    case "lock":
+                        BaritoneControlMod.mouseLocked = true;
+                        // Snap to current rotation
+                        if (getPlayer() != null) {
+                            BaritoneControlMod.lockedYaw = getPlayer().getYaw();
+                            BaritoneControlMod.lockedPitch = getPlayer().getPitch();
+                        }
+                        return jsonOk("Mouse input LOCKED - viewpoint controlled by code only");
+                    case "off":
+                    case "false":
+                    case "unlock":
+                        BaritoneControlMod.mouseLocked = false;
+                        return jsonOk("Mouse input UNLOCKED - manual mouse control enabled");
+                    case "toggle":
+                        BaritoneControlMod.mouseLocked = !BaritoneControlMod.mouseLocked;
+                        if (BaritoneControlMod.mouseLocked && getPlayer() != null) {
+                            BaritoneControlMod.lockedYaw = getPlayer().getYaw();
+                            BaritoneControlMod.lockedPitch = getPlayer().getPitch();
+                        }
+                        return jsonOk("Mouse input " + (BaritoneControlMod.mouseLocked ? "LOCKED" : "UNLOCKED"));
+                    case "baritone_on":
+                        BaritoneControlMod.allowBaritoneRotation = true;
+                        return jsonOk("Baritone rotation allowed while mouse locked");
+                    case "baritone_off":
+                        BaritoneControlMod.allowBaritoneRotation = false;
+                        return jsonOk("Baritone rotation blocked - only /look can change viewpoint");
+                    default:
+                        return jsonError("Use: on, off, toggle, baritone_on, baritone_off, or empty for status");
+                }
             });
             respond(ex, 200, result);
         } catch (Exception e) {
